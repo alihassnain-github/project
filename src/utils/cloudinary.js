@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from 'cloudinary';
+import fs from "fs";
 // Configuration
 cloudinary.config({
     cloud_name: process.env.Cloud_Name,
@@ -6,23 +7,25 @@ cloudinary.config({
     api_secret: process.env.API_Secret
 });
 
-const uploadFiles = async (filePath) => {
+const uploadFile = async (filePath) => {
     if (!filePath) return
 
-    // Upload an image
-    const uploadResult = await cloudinary.uploader
-        .upload(
-            filePath, {
-            resource_type: "auto"
-        }
-        )
-        .catch((error) => {
-            console.log(error);
-        });
+    // upload file
+    try {
+        const uploadResult = await cloudinary.uploader.upload(
+            filePath,
+            {
+                resource_type: "auto"
+            })
 
-    console.log(uploadResult);
-    return uploadResult;
+        console.log(uploadResult);
+        return uploadResult;
+
+    } catch (error) {
+        console.error(error);
+        fs.unlinkSync(filePath);
+    }
 
 };
 
-export default uploadFiles;
+export { uploadFile };
